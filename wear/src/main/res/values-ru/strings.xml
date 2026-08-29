@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play">Играть</string>
+    <string name="again">Заново</string>
+    <string name="menu">Меню</string>
+    <string name="swap">Обмен</string>
+    <string name="mode_two">2 игрока</string>
+    <string name="mode_cpu">С часами</string>
+    <string name="level_easy">Легко</string>
+    <string name="level_normal">Обычно</string>
+    <string name="level_hard">Сложно</string>
+    <string name="swap_on">Обмен вкл</string>
+    <string name="swap_off">Обмен выкл</string>
+    <string name="thinking">Думаю</string>
+    <string name="swapped">Обмен сторон</string>
+    <string name="turn_red">Красные</string>
+    <string name="turn_blue">Синие</string>
+    <string name="turn_you">Вы</string>
+    <string name="turn_cpu">Часы</string>
+    <string name="win_red">Победа красных</string>
+    <string name="win_blue">Победа синих</string>
+    <string name="win_you">Вы выиграли!</string>
+    <string name="win_cpu">Часы выиграли</string>
+    <string name="hint">Нажми клетку</string>
+    <string name="cell_at">Клетка %1$d, %2$d</string>
+    <string name="cell_empty">Пусто</string>
+</resources>

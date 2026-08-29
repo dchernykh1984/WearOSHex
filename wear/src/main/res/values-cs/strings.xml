@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play">Hrát</string>
+    <string name="again">Znovu</string>
+    <string name="menu">Menu</string>
+    <string name="swap">Výměna</string>
+    <string name="mode_two">2 hráči</string>
+    <string name="mode_cpu">S hodinkami</string>
+    <string name="level_easy">Lehká</string>
+    <string name="level_normal">Normální</string>
+    <string name="level_hard">Těžká</string>
+    <string name="swap_on">Výměna ano</string>
+    <string name="swap_off">Výměna ne</string>
+    <string name="thinking">Přemýšlí</string>
+    <string name="swapped">Strany vyměněny</string>
+    <string name="turn_red">Červená</string>
+    <string name="turn_blue">Modrá</string>
+    <string name="turn_you">Ty</string>
+    <string name="turn_cpu">Hodinky</string>
+    <string name="win_red">Vyhrála červená</string>
+    <string name="win_blue">Vyhrála modrá</string>
+    <string name="win_you">Vyhrál jsi!</string>
+    <string name="win_cpu">Vyhrály hodinky</string>
+    <string name="hint">Klepni na pole</string>
+    <string name="cell_at">Pole %1$d, %2$d</string>
+    <string name="cell_empty">Prazdne</string>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play">Jogar</string>
+    <string name="again">De novo</string>
+    <string name="menu">Menu</string>
+    <string name="swap">Troca</string>
+    <string name="mode_two">2 jogadores</string>
+    <string name="mode_cpu">Vs relógio</string>
+    <string name="level_easy">Fácil</string>
+    <string name="level_normal">Normal</string>
+    <string name="level_hard">Difícil</string>
+    <string name="swap_on">Troca sim</string>
+    <string name="swap_off">Troca não</string>
+    <string name="thinking">A pensar</string>
+    <string name="swapped">Lados trocados</string>
+    <string name="turn_red">Vermelho</string>
+    <string name="turn_blue">Azul</string>
+    <string name="turn_you">Você</string>
+    <string name="turn_cpu">Relógio</string>
+    <string name="win_red">Vermelho vence</string>
+    <string name="win_blue">Azul vence</string>
+    <string name="win_you">Você venceu!</string>
+    <string name="win_cpu">Relógio vence</string>
+    <string name="hint">Toque na casa</string>
+    <string name="cell_at">Casa %1$d, %2$d</string>
+    <string name="cell_empty">Vazia</string>
+</resources>

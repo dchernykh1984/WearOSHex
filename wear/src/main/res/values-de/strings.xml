@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play">Spielen</string>
+    <string name="again">Nochmal</string>
+    <string name="menu">Menü</string>
+    <string name="swap">Tausch</string>
+    <string name="mode_two">2 Spieler</string>
+    <string name="mode_cpu">Gegen Uhr</string>
+    <string name="level_easy">Leicht</string>
+    <string name="level_normal">Normal</string>
+    <string name="level_hard">Schwer</string>
+    <string name="swap_on">Tausch an</string>
+    <string name="swap_off">Tausch aus</string>
+    <string name="thinking">Denkt</string>
+    <string name="swapped">Seiten getauscht</string>
+    <string name="turn_red">Rot</string>
+    <string name="turn_blue">Blau</string>
+    <string name="turn_you">Du</string>
+    <string name="turn_cpu">Uhr</string>
+    <string name="win_red">Rot gewinnt</string>
+    <string name="win_blue">Blau gewinnt</string>
+    <string name="win_you">Du gewinnst!</string>
+    <string name="win_cpu">Uhr gewinnt</string>
+    <string name="hint">Feld antippen</string>
+    <string name="cell_at">Feld %1$d, %2$d</string>
+    <string name="cell_empty">Leer</string>
+</resources>
