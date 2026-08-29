@@ -29,7 +29,7 @@ import com.dchernykh.hex.layout.isCellDrawable
 fun HexBoard(
     layout: HexLayout,
     topology: Topology,
-    cells: ByteArray,
+    cells: List<Byte>,
     lastMove: Int,
     screenSize: Int,
     panX: Int,
@@ -74,7 +74,7 @@ fun HexBoard(
  */
 private fun colorFor(
     topology: Topology,
-    cells: ByteArray,
+    cells: List<Byte>,
     cell: Int,
 ): Color {
     when (cells[cell]) {
