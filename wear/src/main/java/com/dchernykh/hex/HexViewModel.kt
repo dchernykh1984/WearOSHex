@@ -32,14 +32,16 @@ enum class Screen { MENU, PLAYING }
  * Everything the screen draws.
  *
  * [cells] is a copy of the board rather than the game's own array, so Compose sees
- * a new value after every stone and nothing can mutate what is being painted.
- * [version] rises with it, which is what tells a recomposition that the copy is new
- * even when two positions happen to compare equal.
+ * a new value after every stone and nothing can mutate what is being painted. A
+ * list rather than a ByteArray, because an array compares by identity and would
+ * make the data class's own equals useless - and eighty-one boxed bytes once per
+ * move is nothing next to hand-writing equality and having to remember every field
+ * added to this class afterwards.
  */
 data class HexUiState(
     val screen: Screen = Screen.MENU,
     val settings: Settings = Settings(),
-    val cells: ByteArray = ByteArray(0),
+    val cells: List<Byte> = emptyList(),
     val boardCells: Int = BoardSize.DEFAULT.cells,
     val turn: Byte = EMPTY,
     val winner: Byte = EMPTY,
@@ -60,33 +62,7 @@ data class HexUiState(
     val revealCell: Int = -1,
     val panX: Int = 0,
     val panY: Int = 0,
-    val version: Int = 0,
-) {
-    // ByteArray gives a data class identity equality, which would make every state
-    // look different; the version is what actually says whether anything moved.
-    override fun equals(other: Any?): Boolean = this === other || (other is HexUiState && sameAs(other))
-
-    private fun sameAs(other: HexUiState): Boolean =
-        screen == other.screen &&
-            settings == other.settings &&
-            version == other.version &&
-            revealCell == other.revealCell &&
-            thinking == other.thinking &&
-            swapAnnounced == other.swapAnnounced &&
-            panX == other.panX &&
-            panY == other.panY
-
-    override fun hashCode(): Int {
-        var result = screen.hashCode()
-        result = 31 * result + settings.hashCode()
-        result = 31 * result + version
-        result = 31 * result + thinking.hashCode()
-        result = 31 * result + swapAnnounced.hashCode()
-        result = 31 * result + panX
-        result = 31 * result + panY
-        return result
-    }
-}
+)
 
 /**
  * The game as the screen sees it.
@@ -253,7 +229,7 @@ class HexViewModel(
     private fun publish(current: Game) {
         _uiState.update {
             it.copy(
-                cells = current.cells.copyOf(),
+                cells = current.cells.toList(),
                 boardCells = current.size,
                 turn = current.turn,
                 winner = current.winner,
@@ -261,7 +237,6 @@ class HexViewModel(
                 moveCount = current.moveCount,
                 seatToMove = current.seatToMove(),
                 firstSeatColor = current.colorForSeat(SEAT_FIRST),
-                version = it.version + 1,
             )
         }
     }
