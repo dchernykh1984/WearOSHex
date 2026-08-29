@@ -199,6 +199,44 @@ class HexViewModelTest {
         }
 
     @Test
+    fun `offers the pie rule to the second seat, once`() =
+        runTest(dispatcher) {
+            val store = FakeSettingsStore(Settings(mode = Mode.TWO_PLAYERS, swapRule = SwapRule.ON))
+            val model = viewModel(store)
+            advanceUntilIdle()
+            model.startGame()
+            advanceUntilIdle()
+
+            assertFalse("nothing has been played yet", model.uiState.value.canSwap)
+
+            model.play(24)
+            advanceUntilIdle()
+            assertTrue(model.uiState.value.canSwap)
+
+            model.swapSides()
+            advanceUntilIdle()
+            assertFalse("the offer stands only once", model.uiState.value.canSwap)
+            // Nothing on the board moved; what changed is whose the stone is.
+            assertEquals(RED, model.uiState.value.cells[24])
+            assertEquals(BLUE, model.uiState.value.firstSeatColor)
+        }
+
+    @Test
+    fun `never offers the pie rule when it is switched off`() =
+        runTest(dispatcher) {
+            val store = FakeSettingsStore(Settings(mode = Mode.TWO_PLAYERS, swapRule = SwapRule.OFF))
+            val model = viewModel(store)
+            advanceUntilIdle()
+            model.startGame()
+            advanceUntilIdle()
+
+            model.play(24)
+            advanceUntilIdle()
+
+            assertFalse(model.uiState.value.canSwap)
+        }
+
+    @Test
     fun `never takes an opening on the opener's own edge`() =
         runTest(dispatcher) {
             val store =
