@@ -10,6 +10,7 @@ import com.dchernykh.hex.game.EMPTY
 import com.dchernykh.hex.game.Mode
 import com.dchernykh.hex.game.RED
 import com.dchernykh.hex.layout.centeredBox
+import com.dchernykh.hex.layout.Box as LayoutBox
 
 // The start menu and the two caps the play screen writes in. They live one file
 // away from the shell that hosts them because they are what changes when the game
@@ -58,15 +59,33 @@ fun PlayCaps(
 
     val bottomHeight = metrics.button
     val bottomTop = screenSize - cap + (cap - bottomHeight) / 2
-    val bottom = centeredBox(screenSize, bottomTop, bottomHeight, metrics.maxWidth * 0.72f, SCREEN_PADDING)
+    val row = centeredBox(screenSize, bottomTop, bottomHeight, metrics.maxWidth, SCREEN_PADDING)
 
-    when {
-        // The pie rule, offered to whoever is about to answer the opening stone.
-        viewModel.canSwap && state.settings.mode == Mode.TWO_PLAYERS ->
-            PillButton(bottom, stringResource(R.string.swap), viewModel::swapSides)
-        state.winner != EMPTY ->
-            PillButton(bottom, stringResource(R.string.again), viewModel::startGame)
-        else -> PillButton(bottom, stringResource(R.string.menu), viewModel::showMenu)
+    // The way back to the menu is always there, and whatever the game is waiting
+    // for stands beside it: the pie rule while it is on offer, a fresh game once
+    // this one is over. Replacing the menu button with either of those would leave
+    // the one screen a player might want to leave with no way off it.
+    val extra: Pair<String, () -> Unit>? =
+        when {
+            // The pie rule, offered to whoever is about to answer the opening
+            // stone - which against the watch is the watch, and it decides for
+            // itself.
+            viewModel.canSwap && state.settings.mode == Mode.TWO_PLAYERS ->
+                stringResource(R.string.swap) to viewModel::swapSides
+            state.winner != EMPTY -> stringResource(R.string.again) to viewModel::startGame
+            else -> null
+        }
+
+    val menu = stringResource(R.string.menu) to viewModel::showMenu
+    val buttons = if (extra == null) listOf(menu) else listOf(extra, menu)
+    val gap = if (buttons.size > 1) metrics.gap else 0
+    val width = (row.w - gap * (buttons.size - 1)) / buttons.size
+    buttons.forEachIndexed { index, (label, action) ->
+        PillButton(
+            box = LayoutBox(row.x + index * (width + gap), row.y, width, row.h),
+            text = label,
+            onClick = action,
+        )
     }
 }
 
