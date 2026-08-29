@@ -1,0 +1,54 @@
+# detekt configuration. Overrides layer on top of detekt's bundled defaults
+# (buildUponDefaultConfig = true in the module build script).
+
+complexity:
+  LongMethod:
+    # Declarative @Composable UI functions are legitimately long.
+    ignoreAnnotated: ['Composable']
+  LongParameterList:
+    functionThreshold: 7
+    constructorThreshold: 7
+    ignoreAnnotated: ['Composable']
+  TooManyFunctions:
+    # A view model that owns the settings, the board and the opponent has one
+    # small function per thing a finger can do, and that is the count this trips
+    # on. Splitting it would put one flow in two places and leave them to agree
+    # with each other about whose turn it is, which is worse than a long list of
+    # one-line functions that each say what they are.
+    thresholdInClasses: 18
+
+naming:
+  FunctionNaming:
+    # @Composable functions are PascalCase by convention.
+    ignoreAnnotated: ['Composable']
+  MatchingDeclarationName:
+    # A file here is a topic - the pacing, the record rule, the round-screen
+    # geometry - holding the functions that make it up and whatever small type
+    # they hand back. This rule fires on exactly those files, and only by an
+    # accident of how many types one of them happens to declare: Snake.kt holds
+    # four and is silently fine, while Records.kt holds one and is not. Renaming
+    # Records.kt to RecordOutcome.kt would name the file after its least
+    # interesting part, so the rule is off rather than obeyed.
+    #
+    # ktlint still enforces the case the rule is actually for - a file whose only
+    # content is one class - so SpeedLevel.kt cannot drift back to Speed.kt.
+    active: false
+
+style:
+  MagicNumber:
+    # The layout is a pile of proportions - how much of the top segment the score
+    # takes, how far an arrow reaches into its box - and each one is named and
+    # explained where it is declared. Hoisting them into constants a second time
+    # would add names without adding meaning.
+    active: false
+  ReturnCount:
+    # Guard-clause early returns are how the rule set stays readable. A tick has
+    # four ways to end - the game was already over, the wall, itself, or an
+    # ordinary move - and folding any of them into the others buys nothing.
+    max: 4
+  UnusedPrivateMember:
+    # A @Preview function is called by Android Studio's preview renderer, never
+    # from code, so every one of them looks unused to static analysis. Only
+    # @Preview is exempted, not @Composable: a composable nothing calls really is
+    # dead and should still be reported.
+    ignoreAnnotated: ['Preview']

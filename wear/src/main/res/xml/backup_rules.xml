@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The pre-Android-12 half of the same statement data_extraction_rules.xml
+     makes: nothing the app stores is backed up. Backup is already switched off
+     outright by android:allowBackup="false", so on API 30 this file is never
+     consulted - it is here because the platform pairs the two attributes and a
+     build that sets only the newer one is, as far as an API 30 watch is
+     concerned, silent about backup. -->
+<full-backup-content>
+    <exclude domain="root" />
+</full-backup-content>

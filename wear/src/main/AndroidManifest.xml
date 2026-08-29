@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Restricts installation to watches and marks the APK as the Wear OS form
+         factor. -->
+    <uses-feature
+        android:name="android.hardware.type.watch"
+        android:required="true" />
+
+    <!-- No permissions. The game reads no sensor, opens no socket and stores its
+         records in the app's own private storage; the screen is kept awake with a
+         window flag, which needs none either. -->
+
+    <!-- Backup is off. The only thing worth backing up is a high score, and
+         copying it to the user's Google Drive would let a record survive a
+         reinstall on one watch and reappear on another - which is not what a
+         personal best on a specific watch means.
+
+         It takes all three attributes to say that across the supported range:
+         allowBackup switches backup off, fullBackupContent is the rule set API
+         30 reads, and dataExtractionRules is what replaced it from API 31. -->
+    <application
+        android:allowBackup="false"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.DeviceDefault">
+
+        <!-- The game needs no phone at all, so it is installable on watches
+             paired with an iPhone. Required for the Wear OS Play Store listing. -->
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="true" />
+
+        <!-- No screenOrientation: a watch has exactly one, Android 16 ignores a
+             fixed orientation anyway, and pinning it is a lint error waiting to
+             happen for nothing gained. -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:taskAffinity="">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
