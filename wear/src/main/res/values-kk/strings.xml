@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play">Ойнау</string>
+    <string name="again">Қайта</string>
+    <string name="menu">Мәзір</string>
+    <string name="swap">Алмасу</string>
+    <string name="mode_two">2 ойыншы</string>
+    <string name="mode_cpu">Сағатпен</string>
+    <string name="level_easy">Оңай</string>
+    <string name="level_normal">Қалыпты</string>
+    <string name="level_hard">Қиын</string>
+    <string name="swap_on">Алмасу қосу</string>
+    <string name="swap_off">Алмасу өшір</string>
+    <string name="thinking">Ойлануда</string>
+    <string name="swapped">Жақтар алмасты</string>
+    <string name="turn_red">Қызыл</string>
+    <string name="turn_blue">Көк</string>
+    <string name="turn_you">Сіз</string>
+    <string name="turn_cpu">Сағат</string>
+    <string name="win_red">Қызыл жеңді</string>
+    <string name="win_blue">Көк жеңді</string>
+    <string name="win_you">Сіз жеңдіңіз!</string>
+    <string name="win_cpu">Сағат жеңді</string>
+    <string name="hint">Торды басыңыз</string>
+    <string name="cell_at">Тор %1$d, %2$d</string>
+    <string name="cell_empty">Бос</string>
+</resources>

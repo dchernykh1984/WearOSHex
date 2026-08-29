@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play">Spelen</string>
+    <string name="again">Opnieuw</string>
+    <string name="menu">Menu</string>
+    <string name="swap">Ruilen</string>
+    <string name="mode_two">2 spelers</string>
+    <string name="mode_cpu">Tegen horloge</string>
+    <string name="level_easy">Makkelijk</string>
+    <string name="level_normal">Normaal</string>
+    <string name="level_hard">Moeilijk</string>
+    <string name="swap_on">Ruilen aan</string>
+    <string name="swap_off">Ruilen uit</string>
+    <string name="thinking">Denkt na</string>
+    <string name="swapped">Kanten geruild</string>
+    <string name="turn_red">Rood</string>
+    <string name="turn_blue">Blauw</string>
+    <string name="turn_you">Jij</string>
+    <string name="turn_cpu">Horloge</string>
+    <string name="win_red">Rood wint</string>
+    <string name="win_blue">Blauw wint</string>
+    <string name="win_you">Jij wint!</string>
+    <string name="win_cpu">Horloge wint</string>
+    <string name="hint">Tik op een vak</string>
+    <string name="cell_at">Vak %1$d, %2$d</string>
+    <string name="cell_empty">Leeg</string>
+</resources>

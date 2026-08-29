@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="play">Jouer</string>
+    <string name="again">Rejouer</string>
+    <string name="menu">Menu</string>
+    <string name="swap">Échange</string>
+    <string name="mode_two">2 joueurs</string>
+    <string name="mode_cpu">Vs montre</string>
+    <string name="level_easy">Facile</string>
+    <string name="level_normal">Normal</string>
+    <string name="level_hard">Difficile</string>
+    <string name="swap_on">Échange oui</string>
+    <string name="swap_off">Échange non</string>
+    <string name="thinking">Réfléchit</string>
+    <string name="swapped">Côtés échangés</string>
+    <string name="turn_red">Rouge</string>
+    <string name="turn_blue">Bleu</string>
+    <string name="turn_you">Vous</string>
+    <string name="turn_cpu">Montre</string>
+    <string name="win_red">Rouge gagne</string>
+    <string name="win_blue">Bleu gagne</string>
+    <string name="win_you">Vous gagnez!</string>
+    <string name="win_cpu">Montre gagne</string>
+    <string name="hint">Touchez une case</string>
+    <string name="cell_at">Case %1$d, %2$d</string>
+    <string name="cell_empty">Vide</string>
+</resources>

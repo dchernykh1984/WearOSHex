@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The screen strings, in the eleven languages the Zepp OS original shipped.
+     Android resolves the watch's locale to the right table on its own, so
+     Kazakh - which Zepp OS had no device-language code for - finally reaches the
+     people it was translated for.
+
+     Adding a language means adding one values-<code>/strings.xml with every key
+     below; Android Lint's MissingTranslation check is an error here, so a table
+     that is short of a key fails the build rather than falling back silently. -->
+<resources>
+    <!-- The name the launcher shows, and the title over the start menu. -->
+    <string name="app_name" translatable="false">Hex Duel</string>
+    <string name="play">Play</string>
+    <string name="again">Again</string>
+    <string name="menu">Menu</string>
+    <string name="swap">Swap</string>
+    <!-- Two seats at one watch, or one seat against the watch. -->
+    <string name="mode_two">2 players</string>
+    <string name="mode_cpu">vs Watch</string>
+    <string name="level_easy">Easy</string>
+    <string name="level_normal">Normal</string>
+    <string name="level_hard">Hard</string>
+    <!-- What the pie-rule button says about the state it is in. -->
+    <string name="swap_on">Swap on</string>
+    <string name="swap_off">Swap off</string>
+    <string name="thinking">Thinking</string>
+    <!-- Said when the watch takes the opening stone: nothing on the board moves when it happens, so the screen has to. -->
+    <string name="swapped">Sides swapped</string>
+    <!-- Whose turn it is. Against the watch the two seats are named You and Watch instead of by colour, because that is how a player thinks of them. -->
+    <string name="turn_red">Red</string>
+    <string name="turn_blue">Blue</string>
+    <string name="turn_you">You</string>
+    <string name="turn_cpu">Watch</string>
+    <string name="win_red">Red wins</string>
+    <string name="win_blue">Blue wins</string>
+    <string name="win_you">You win!</string>
+    <string name="win_cpu">Watch wins</string>
+    <!-- A full sentence under the start menu. -->
+    <string name="hint">Tap a cell</string>
+    <!-- Which cell a finger is on, by column and row counting from one, and what is standing on it. The board is drawn, so these are all a screen reader has to go on. -->
+    <string name="cell_at">Cell %1$d, %2$d</string>
+    <string name="cell_empty">Empty</string>
+</resources>
