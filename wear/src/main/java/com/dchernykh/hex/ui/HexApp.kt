@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -23,7 +24,9 @@ import com.dchernykh.hex.game.topologyFor
 import com.dchernykh.hex.layout.HexLayout
 import com.dchernykh.hex.layout.cellAt
 import com.dchernykh.hex.layout.clampPan
+import com.dchernykh.hex.layout.isCellFullyVisible
 import com.dchernykh.hex.layout.panLimits
+import com.dchernykh.hex.layout.panToCell
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -56,6 +59,21 @@ fun HexApp(viewModel: HexViewModel) {
     KeepScreenOnWhile(state.screen == Screen.PLAYING)
 
     BackHandler(enabled = state.screen != Screen.MENU) { viewModel.showMenu() }
+
+    // The watch may well answer somewhere the board has been dragged away from, so
+    // bring its stone into view rather than leaving the player to hunt for what
+    // changed. The geometry is the screen's business, which is why the view model
+    // only says which stone needs showing.
+    LaunchedEffect(state.revealCell, layout, band) {
+        val cell = state.revealCell
+        if (cell < 0) return@LaunchedEffect
+        if (isCellFullyVisible(layout, cell, state.panX, state.panY, screenSize, SCREEN_PADDING, band)) {
+            viewModel.revealed(state.panX, state.panY)
+        } else {
+            val pan = panToCell(layout, cell, screenSize, SCREEN_PADDING, band)
+            viewModel.revealed(pan.x, pan.y)
+        }
+    }
 
     MaterialTheme {
         Box(
