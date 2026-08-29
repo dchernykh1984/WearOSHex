@@ -1,0 +1,192 @@
+name: Build and Distribute
+
+# Cut a release by pushing a tag, e.g. `git tag v0.1.0 && git push origin v0.1.0`.
+# It is also called by release-please (workflow_call) right after it creates a
+# release, so merging a release PR ends up with a signed APK attached
+# automatically - without a PAT or a manual tag re-push.
+# workflow_dispatch builds the signed APK without publishing (useful for testing
+# the signing pipeline).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      tag:
+        description: "Release tag to build and attach the signed APK to"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # required to create a Release and upload the APK assets
+      id-token: write # required to sign the build provenance attestation
+      attestations: write # required to record the attestation
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Build the tagged commit whether triggered by a tag push or by
+          # release-please (which passes the freshly created tag).
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: actions/setup-java@v5.7.0
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      # Without this the build silently produces an unsigned APK (the
+      # signingConfig is only created when KEYSTORE_FILE is set), and the failure
+      # only surfaces when a user cannot install the release. Fail loudly and
+      # early instead.
+      - name: Verify signing secrets are present
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          missing=""
+          for name in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              missing="$missing $name"
+            fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing signing secret(s):$missing. Set all four before releasing."
+            exit 1
+          fi
+
+      - name: Decode release keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+
+      # versionCode is derived from the release version, NOT from
+      # github.run_number. run_number is per-workflow: on the workflow_call path
+      # it is release-please's counter, on a manual tag push it is this
+      # workflow's own. Mixing the two paths - or renaming a workflow file, which
+      # restarts the counter - can emit a lower versionCode than an already
+      # published release and permanently block over-the-top installs.
+      - name: Resolve release tag, version and version code
+        id: version
+        run: |
+          tag="${RELEASE_TAG}"
+          name="${tag#v}"
+          # Anchored at both ends on purpose: a prerelease tag like v1.0.0-rc.1
+          # would otherwise share a versionCode with the eventual v1.0.0.
+          if [[ "$name" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            major="${BASH_REMATCH[1]}"
+            minor="${BASH_REMATCH[2]}"
+            patch="${BASH_REMATCH[3]}"
+            if [ "$minor" -gt 999 ] || [ "$patch" -gt 999 ]; then
+              echo "::error::minor and patch must each stay below 1000 for this versionCode scheme."
+              exit 1
+            fi
+            # Each component owns its own decimal field, so no two versions can
+            # collide (0.1.100 and 0.2.0 are 1100 and 2000, not both 200), and the
+            # result stays far below Play's 2100000000 ceiling.
+            code=$(( major * 1000000 + minor * 1000 + patch ))
+          elif [ "$PUBLISHING" = "true" ]; then
+            echo "::error::Release tag '$tag' is not vMAJOR.MINOR.PATCH; refusing to publish."
+            exit 1
+          else
+            # workflow_dispatch off a branch: build and sign, but never publish.
+            echo "::warning::'$tag' is not a vX.Y.Z tag; using version code base 1."
+            code=1
+          fi
+          # On the workflow_dispatch path the "version" is a branch name, which
+          # may contain slashes ("feat/signing-test"). Those would turn the staged
+          # artifact path into a non-existent subdirectory and break the one flow
+          # that trigger exists for, so filenames use a sanitized slug.
+          slug="$(printf '%s' "$name" | tr -c 'A-Za-z0-9._-' '-')"
+          {
+            echo "tag=${tag}"
+            echo "name=${name}"
+            echo "slug=${slug}"
+            echo "code=${code}"
+          } >> "$GITHUB_OUTPUT"
+        env:
+          # inputs.tag is set on workflow_call; otherwise use the pushed tag.
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          PUBLISHING: ${{ inputs.tag != '' || startsWith(github.ref, 'refs/tags/') }}
+
+      - name: Build the signed release APK
+        env:
+          KEYSTORE_FILE: ${{ runner.temp }}/release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION_CODE: ${{ steps.version.outputs.code }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: ./gradlew assembleRelease
+
+      - name: Stage the APK with a versioned name
+        run: |
+          mkdir -p dist
+          cp wear/build/outputs/apk/release/wear-release.apk \
+            "dist/wearos-hex-${{ steps.version.outputs.slug }}.apk"
+
+      # R8 is on for release builds, so a crash report from a published APK is
+      # unreadable without the mapping file for that exact build. It lives only in
+      # the runner's build directory, so publish it alongside the APK or the
+      # obfuscation becomes permanent for anyone debugging that release.
+      - name: Stage the R8 mapping file
+        run: |
+          src="wear/build/outputs/mapping/release/mapping.txt"
+          if [ ! -f "$src" ]; then
+            echo "::error::${src} is missing but R8 minification is enabled."
+            exit 1
+          fi
+          cp "$src" "dist/wearos-hex-${{ steps.version.outputs.slug }}-mapping.txt"
+
+      - name: Verify the APK signature
+        run: |
+          APKSIGNER=$(find "$ANDROID_SDK_ROOT/build-tools" -name apksigner | sort -r | head -1)
+          if [ -z "$APKSIGNER" ]; then
+            echo "::error::apksigner not found in the Android SDK build-tools."
+            exit 1
+          fi
+          for apk in dist/*.apk; do
+            "$APKSIGNER" verify --verbose --print-certs "$apk"
+          done
+
+      # Records a signed, verifiable statement that this exact APK was built by
+      # this workflow from this commit. Users can check it with
+      # `gh attestation verify <apk> --repo dchernykh1984/WearOSHex`.
+      - name: Attest build provenance
+        if: inputs.tag != '' || startsWith(github.ref, 'refs/tags/')
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: dist/*.apk
+
+      - name: Publish the APK to the GitHub Release
+        if: inputs.tag != '' || startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v3
+        with:
+          # Target the tag explicitly: on workflow_call github.ref is the default
+          # branch, not the tag. Attach to the existing release-please release
+          # without regenerating its changelog body.
+          tag_name: ${{ steps.version.outputs.tag }}
+          files: |
+            dist/*.apk
+            dist/*-mapping.txt
+          fail_on_unmatched_files: true
+          generate_release_notes: false

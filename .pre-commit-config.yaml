@@ -1,0 +1,71 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: check-xml
+      - id: end-of-file-fixer
+        exclude: '^gradle/wrapper/gradle-wrapper\.jar$'
+      - id: trailing-whitespace
+        exclude: '\.bat$'
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: '\.bat$'
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.16.4
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  - repo: local
+    hooks:
+      - id: no-non-ascii
+        name: no non-ASCII characters
+        language: pygrep
+        entry: '[^\x00-\x7f]'
+        # XML is deliberately absent: res/values-<lang>/strings.xml holds the
+        # eleven translations, and the point of this hook is to keep source and
+        # config ASCII, not to block translated text.
+        types_or: [kotlin, yaml, markdown, toml, shell, json]
+        # The vendored Gradle wrapper script ships non-ASCII characters in its
+        # comments; it is upstream code we do not edit.
+        exclude: '^gradlew$'
+
+      # An unescaped apostrophe inside a <string> is an aapt2 error, not a
+      # warning, and it only surfaces when the resources are compiled - which
+      # locally can mean not until CI. Catching it at commit time turns a
+      # ten-minute round trip into an instant one.
+      - id: unescaped-apostrophe
+        name: apostrophes in string resources are escaped
+        language: pygrep
+        entry: '<string[^>]*>[^<]*(?<!\\)'''
+        files: 'src/main/res/values.*/strings\.xml$'
+
+  # Kotlin linting and static analysis run through Gradle, so they require the
+  # JDK + Android SDK. They are staged at pre-push (not every commit) to keep
+  # local commits fast; CI also runs them as a dedicated Gradle job.
+  - repo: local
+    hooks:
+      - id: ktlint
+        name: ktlint
+        entry: ./gradlew --quiet ktlintCheck
+        language: system
+        pass_filenames: false
+        types_or: [kotlin]
+        stages: [pre-push]
+      - id: detekt
+        name: detekt
+        entry: ./gradlew --quiet detekt
+        language: system
+        pass_filenames: false
+        types_or: [kotlin]
+        stages: [pre-push]
+      - id: unit-tests
+        name: unit tests
+        entry: ./gradlew --quiet testDebugUnitTest
+        language: system
+        pass_filenames: false
+        types_or: [kotlin]
+        stages: [pre-push]

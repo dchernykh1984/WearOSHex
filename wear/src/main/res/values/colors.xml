@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The ground the Zepp OS icon is drawn on, moved into the adaptive icon's
+         background layer so the launcher's own mask has something to cut instead
+         of clipping a disc that is already part of the picture. -->
+    <color name="ic_launcher_background">#161C22</color>
+</resources>
