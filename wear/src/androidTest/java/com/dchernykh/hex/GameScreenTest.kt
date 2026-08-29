@@ -41,6 +41,10 @@ class GameScreenTest {
 
     @Test
     fun walksTheBoardSizes() {
+        // Board sizes cycle whatever mode the watch is in, so this one needs no
+        // setting up - but like every test here it starts from what it finds
+        // rather than from what it would like.
+
         val labels = BoardSize.entries.map { it.label }
         rule.waitUntil { labels.any(::onScreen) }
         val before = labels.first(::onScreen)
@@ -53,17 +57,30 @@ class GameScreenTest {
 
     @Test
     fun walksTheModesAndHidesTheLevelWithTheWatch() {
+        // Started from whichever mode the watch was last left on, because the
+        // settings are stored and a test that assumed one of them would pass or
+        // fail depending on what ran before it.
         val modes = Mode.entries.map { text(it.labelRes) }
         rule.waitUntil { modes.any(::onScreen) }
+        walkToMode(Mode.COMPUTER)
 
         // Against the watch there is a level to set; between two people there is
         // nothing for it to mean, so the button is not there at all.
-        rule.onNodeWithText(text(Mode.COMPUTER.labelRes)).assertIsDisplayed()
         rule.waitUntil { Level.entries.any { onScreen(text(it.labelRes)) } }
 
-        rule.onNodeWithText(text(Mode.COMPUTER.labelRes)).performClick()
-        rule.waitUntil { onScreen(text(Mode.TWO_PLAYERS.labelRes)) }
+        walkToMode(Mode.TWO_PLAYERS)
         rule.waitUntil { Level.entries.none { onScreen(text(it.labelRes)) } }
+    }
+
+    /** Tap the mode button until it shows the one wanted. */
+    private fun walkToMode(wanted: Mode) {
+        repeat(Mode.entries.size) {
+            if (onScreen(text(wanted.labelRes))) return
+            val showing = Mode.entries.first { onScreen(text(it.labelRes)) }
+            rule.onNodeWithText(text(showing.labelRes)).performClick()
+            rule.waitUntil { !onScreen(text(showing.labelRes)) }
+        }
+        rule.onNodeWithText(text(wanted.labelRes)).assertIsDisplayed()
     }
 
     @Test
