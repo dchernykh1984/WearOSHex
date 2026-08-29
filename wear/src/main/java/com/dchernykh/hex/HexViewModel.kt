@@ -51,6 +51,13 @@ data class HexUiState(
     val firstSeatColor: Byte = EMPTY,
     val thinking: Boolean = false,
     val swapAnnounced: Boolean = false,
+    /**
+     * The stone the watch has just answered with, until the screen has had a
+     * chance to bring it into view. The board may well have been dragged away from
+     * where the watch played, and leaving the player to hunt for what changed on a
+     * board of eighty-one cells is no way to run a game.
+     */
+    val revealCell: Int = -1,
     val panX: Int = 0,
     val panY: Int = 0,
     val version: Int = 0,
@@ -63,6 +70,7 @@ data class HexUiState(
         screen == other.screen &&
             settings == other.settings &&
             version == other.version &&
+            revealCell == other.revealCell &&
             thinking == other.thinking &&
             swapAnnounced == other.swapAnnounced &&
             panX == other.panX &&
@@ -135,7 +143,7 @@ class HexViewModel(
         val fresh = Game(current.boardSize.cells, swapRule = current.swapRule.enabled)
         game = fresh
         _uiState.update {
-            it.copy(screen = Screen.PLAYING, swapAnnounced = false, panX = 0, panY = 0)
+            it.copy(screen = Screen.PLAYING, swapAnnounced = false, panX = 0, panY = 0, revealCell = -1)
         }
         publish(fresh)
         maybeThink()
@@ -151,7 +159,21 @@ class HexViewModel(
         x: Int,
         y: Int,
     ) {
-        _uiState.update { it.copy(panX = x, panY = y) }
+        _uiState.update { it.copy(panX = x, panY = y, revealCell = -1) }
+    }
+
+    /**
+     * Move the board so the watch's answer is on screen, and mark it shown.
+     *
+     * The screen works out where to move to, because the geometry is its business;
+     * this only records that the stone no longer needs revealing, so the board is
+     * not dragged back the moment the player moves it themselves.
+     */
+    fun revealed(
+        x: Int,
+        y: Int,
+    ) {
+        _uiState.update { it.copy(panX = x, panY = y, revealCell = -1) }
     }
 
     /**
@@ -215,8 +237,8 @@ class HexViewModel(
                 // pause on the main thread is a frozen screen rather than a
                 // thinking one.
                 val move = withContext(searchDispatcher) { chooseMove(current, level, random) }
-                if (move >= 0) current.play(move)
-                _uiState.update { it.copy(thinking = false) }
+                val played = move >= 0 && current.play(move)
+                _uiState.update { it.copy(thinking = false, revealCell = if (played) move else -1) }
                 publish(current)
             }
     }
