@@ -1,6 +1,7 @@
 package com.dchernykh.hex.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.dchernykh.hex.HexUiState
 import com.dchernykh.hex.HexViewModel
@@ -70,7 +71,7 @@ fun PlayCaps(
             // The pie rule, offered to whoever is about to answer the opening
             // stone - which against the watch is the watch, and it decides for
             // itself.
-            viewModel.canSwap && state.settings.mode == Mode.TWO_PLAYERS ->
+            state.canSwap && state.settings.mode == Mode.TWO_PLAYERS ->
                 stringResource(R.string.swap) to viewModel::swapSides
             state.winner != EMPTY -> stringResource(R.string.again) to viewModel::startGame
             else -> null
@@ -114,7 +115,7 @@ private fun statusText(state: HexUiState): String {
     }
 }
 
-private fun statusColor(state: HexUiState): androidx.compose.ui.graphics.Color =
+private fun statusColor(state: HexUiState): Color =
     when {
         state.thinking || state.swapAnnounced -> ColorMuted
         state.winner == RED || (state.winner == EMPTY && state.turn == RED) -> ColorRed

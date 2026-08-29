@@ -52,6 +52,8 @@ data class HexUiState(
     /** The colour each seat plays; the pie rule can swap them. */
     val firstSeatColor: Byte = EMPTY,
     val thinking: Boolean = false,
+    /** Whether the pie rule is on offer to the seat about to move. */
+    val canSwap: Boolean = false,
     val swapAnnounced: Boolean = false,
     /**
      * The stone the watch has just answered with, until the screen has had a
@@ -237,12 +239,10 @@ class HexViewModel(
                 moveCount = current.moveCount,
                 seatToMove = current.seatToMove(),
                 firstSeatColor = current.colorForSeat(SEAT_FIRST),
+                canSwap = current.canSwap(),
             )
         }
     }
-
-    /** Whether the pie rule is on offer to the seat that is about to move. */
-    val canSwap: Boolean get() = game?.canSwap() == true
 
     companion object {
         fun factory(store: SettingsStore): ViewModelProvider.Factory =
