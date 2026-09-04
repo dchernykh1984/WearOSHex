@@ -31,7 +31,7 @@ Session.vim
 # ===== AI agents =====
 
 # Claude Code (Anthropic)
-.claude/
+.claude/settings.local.json
 
 # Cursor
 .cursor/
