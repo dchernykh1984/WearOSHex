@@ -13,11 +13,11 @@ androidxTestRunner = "1.7.0"
 # Wear Compose 1.6.2 declares androidx.compose 1.9.0, so the compose pin follows
 # it rather than the other way round. No BOM: with a single Android module on a
 # wear-specific train, explicit versions are easier to reason about.
-wearCompose = "1.6.2"
+wearCompose = "1.7.0"
 composeUi = "1.9.0"
 activityCompose = "1.12.3"
 # 1.19.0 requires compileSdk 37; 1.18.0 is the highest that builds against 36.
-coreKtx = "1.19.0"
+coreKtx = "1.19.1"
 wearToolingPreview = "1.0.0"
 lifecycle = "2.9.4"
 kotlinxCoroutines = "1.11.0"
