@@ -21,6 +21,13 @@ repos:
 
   - repo: local
     hooks:
+      - id: coding-agent-hook-tests
+        name: coding agent edit guard tests
+        language: python
+        entry: python -m unittest discover -s .codex/hooks -p test_*.py
+        pass_filenames: false
+        files: '^\.codex/'
+
       - id: no-non-ascii
         name: no non-ASCII characters
         language: pygrep
