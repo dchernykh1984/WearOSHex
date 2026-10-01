@@ -1,0 +1,4 @@
+{
+  "files": "\\.(?:kt|kts|yml|yaml|md|toml|sh|json)$",
+  "exclude": "^gradlew$"
+}
